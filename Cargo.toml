@@ -1,0 +1,12 @@
+[package]
+name = "shess"
+version = "0.1.0"
+authors = ["Sebastian <Sebastian@Strobl.net>"]
+edition = "2018"
+publish = true
+license-file = "LICENSE"
+description = "we shessing"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
