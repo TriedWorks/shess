@@ -16,4 +16,5 @@ terminal = []
 discord = []
 
 [dependencies]
+fructose = "0.3.3"
 glucose = "0.2.1"

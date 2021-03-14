@@ -5,14 +5,32 @@ pub mod defaults;
 pub mod discord;
 #[cfg(feature = "terminal")]
 pub mod terminal;
+pub mod cache;
+
+#[derive(Debug, Copy, Clone)]
+pub struct Move<const N: usize> {
+    player_id: i32,
+    piece_id: i32,
+    from: Option<Point<i32, { N }>>,
+    to: Point<i32, { N }>
+}
+
+#[derive(Debug, Copy, Clone)]
+pub struct RenderMove2D {
+    player_id: i32,
+    piece_id: i32,
+    pos: Point<i32, 2>
+}
 
 pub struct Player {
-    pieces: Vec<i32>
+    id: i32
 }
 
 impl Player {
-    pub const fn new(pieces: Vec<i32>) -> Self {
-        Self { pieces }
+    pub const fn new(id: i32) -> Self {
+        Self {
+            id
+        }
     }
 }
 
@@ -24,6 +42,7 @@ pub struct Piece<const N: usize> {
     ty: i32,
     pos: Point<i32, { N }>,
 }
+
 impl<const N: usize> Piece<{ N }> {
     pub fn new(player: i32, id: i32, ty: i32, pos: Point<i32, { N }>) -> Self {
         Self { player, id, sub_id: None, ty, pos }
@@ -35,15 +54,15 @@ impl<const N: usize> Piece<{ N }> {
 }
 
 pub struct Board<const DIMS: usize> {
+    start: Point<i32, { DIMS }>,
     size: [i32; DIMS],
-    board: Vec<Option<i32>>
 }
 
 impl<const DIMS: usize> Board<{ DIMS }> {
-    pub fn new(size: [i32; DIMS]) -> Self {
+    pub fn new(start: Point<i32, { DIMS }>, size: [i32; DIMS]) -> Self {
         Self {
+            start,
             size,
-            board: vec![]
         }
     }
 }
@@ -59,6 +78,10 @@ pub trait Mode {
     fn create_player(&self) -> Vec<Player>;
 
     fn next_move(&mut self, input: String, player: i32) -> Result<Option<String>, String>;
+
+    fn execute_move(&mut self, player: i32);
+
+    fn board(&self) -> (Vec<RenderMove2D>, usize);
 }
 
 pub trait Backend {
@@ -94,12 +117,28 @@ impl<M: Mode, B: Backend> Game<M, B> {
     pub fn next_move(&mut self) {
         let mut input = self.backend.receive();
         while input.is_err() {
-            self.backend.send(String::from("Wrong Input"));
+            match self.backend.send(String::from("Wrong Input")) {
+                Ok(_) => {}
+                Err(err) => {panic!(format!("{}", err))}
+            };
             input = self.backend.receive();
         }
-        self.mode.next_move(input.unwrap().unwrap(), self.current_player);
+        match self.mode.next_move(input.unwrap().unwrap(), self.current_player) {
+            Ok(_) => {}
+            Err(err) => {
+                match self.backend.send(String::from(format!("Error in Move: {}", err))) {
+                    Ok(_) => {}
+                    Err(err) => {panic!(format!("{}", err))}
+                };
+                self.next_move()
+            }
+        }
+        self.mode.execute_move()
     }
 
+    pub fn backend(&mut self) -> &mut B {
+        &mut self.backend
+    }
 }
 
 #[test]

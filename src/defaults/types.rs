@@ -20,3 +20,17 @@ impl From<PieceType> for i32 {
         }
     }
 }
+
+impl From<i32> for PieceType {
+    fn from(num: i32) -> Self {
+        match num {
+            5 => PieceType::King,
+            4 => PieceType::Queen,
+            3 => PieceType::Rook,
+            2 => PieceType::Bishop,
+            1 => PieceType::Knight,
+            0 => PieceType::Pawn,
+            _ => panic!("Invalid number!")
+        }
+    }
+}
