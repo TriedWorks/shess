@@ -9,4 +9,11 @@ description = "we shessing"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[features]
+default = []
+full = ["terminal", "discord"]
+terminal = []
+discord = []
+
 [dependencies]
+glucose = "0.2.1"
