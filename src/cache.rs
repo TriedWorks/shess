@@ -1,8 +1,8 @@
 use crate::Move;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Clone)]
 pub struct MoveCache<const N: usize> {
-    pub cache: Vec<Move<{ N }>>
+    pub cache: Vec<Move<{ N }>>,
 }
 
 impl<const N: usize> MoveCache<{ N }> {
@@ -12,7 +12,7 @@ impl<const N: usize> MoveCache<{ N }> {
 
     pub fn new_with_capacity(capacity: usize) -> Self {
         Self {
-            cache: Vec::with_capacity(capacity)
+            cache: Vec::with_capacity(capacity),
         }
     }
 }

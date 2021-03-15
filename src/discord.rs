@@ -2,7 +2,7 @@ use crate::{Backend, Message};
 use std::error::Error;
 
 pub struct Discord {
-    queue: Vec<String>
+    queue: Vec<String>,
 }
 
 impl Backend for Discord {

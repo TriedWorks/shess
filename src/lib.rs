@@ -1,36 +1,34 @@
 use glucose::linear::vec::Point;
 
+pub mod cache;
 pub mod defaults;
 #[cfg(feature = "discord")]
 pub mod discord;
 #[cfg(feature = "terminal")]
 pub mod terminal;
-pub mod cache;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Move<const N: usize> {
     player_id: i32,
     piece_id: i32,
     from: Option<Point<i32, { N }>>,
-    to: Point<i32, { N }>
+    to: Point<i32, { N }>,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct RenderMove2D {
     player_id: i32,
     piece_id: i32,
-    pos: Point<i32, 2>
+    pos: Point<i32, 2>,
 }
 
 pub struct Player {
-    id: i32
+    id: i32,
 }
 
 impl Player {
     pub const fn new(id: i32) -> Self {
-        Self {
-            id
-        }
+        Self { id }
     }
 }
 
@@ -45,11 +43,29 @@ pub struct Piece<const N: usize> {
 
 impl<const N: usize> Piece<{ N }> {
     pub fn new(player: i32, id: i32, ty: i32, pos: Point<i32, { N }>) -> Self {
-        Self { player, id, sub_id: None, ty, pos }
+        Self {
+            player,
+            id,
+            sub_id: None,
+            ty,
+            pos,
+        }
     }
 
-    pub fn new_with_sub(player: i32, id: i32, sub_id: i32, ty: i32, pos: Point<i32, { N }>) -> Self {
-        Self { player, id, sub_id: Some(sub_id), ty, pos }
+    pub fn new_with_sub(
+        player: i32,
+        id: i32,
+        sub_id: i32,
+        ty: i32,
+        pos: Point<i32, { N }>,
+    ) -> Self {
+        Self {
+            player,
+            id,
+            sub_id: Some(sub_id),
+            ty,
+            pos,
+        }
     }
 }
 
@@ -60,13 +76,16 @@ pub struct Board<const DIMS: usize> {
 
 impl<const DIMS: usize> Board<{ DIMS }> {
     pub fn new(start: Point<i32, { DIMS }>, size: [i32; DIMS]) -> Self {
-        Self {
-            start,
-            size,
-        }
+        Self { start, size }
     }
 }
 
+pub enum PlayerSwap {
+    NextUp,
+    NextDown,
+    Same,
+    Custom(i32),
+}
 
 pub trait Mode {
     const PLAYERS: usize;
@@ -82,6 +101,8 @@ pub trait Mode {
     fn execute_move(&mut self, player: i32);
 
     fn board(&self) -> (Vec<RenderMove2D>, usize);
+
+    fn next_player(&self) -> PlayerSwap;
 }
 
 pub trait Backend {
@@ -96,7 +117,7 @@ pub struct Game<M: Mode, B: Backend> {
     mode: M,
     backend: B,
     players: Vec<Player>,
-    current_player: i32,
+    current_player: (i32, usize),
 }
 
 impl<M: Mode, B: Backend> Game<M, B> {
@@ -110,7 +131,7 @@ impl<M: Mode, B: Backend> Game<M, B> {
             mode,
             backend,
             players,
-            current_player: M::STARTING_PLAYER,
+            current_player: (M::STARTING_PLAYER, 0),
         }
     }
 
@@ -119,25 +140,64 @@ impl<M: Mode, B: Backend> Game<M, B> {
         while input.is_err() {
             match self.backend.send(String::from("Wrong Input")) {
                 Ok(_) => {}
-                Err(err) => {panic!(format!("{}", err))}
+                Err(err) => {
+                    panic!(format!("{}", err))
+                }
             };
             input = self.backend.receive();
         }
-        match self.mode.next_move(input.unwrap().unwrap(), self.current_player) {
+        match self
+            .mode
+            .next_move(input.unwrap().unwrap(), self.current_player.0)
+        {
             Ok(_) => {}
             Err(err) => {
-                match self.backend.send(String::from(format!("Error in Move: {}", err))) {
+                match self
+                    .backend
+                    .send(String::from(format!("Error in Move: {}", err)))
+                {
                     Ok(_) => {}
-                    Err(err) => {panic!(format!("{}", err))}
+                    Err(err) => {
+                        panic!(format!("{}", err))
+                    }
                 };
                 self.next_move()
             }
         }
-        self.mode.execute_move()
+        self.mode.execute_move(self.current_player.0)
     }
 
     pub fn backend(&mut self) -> &mut B {
         &mut self.backend
+    }
+
+    fn swap_player(&mut self, swap: PlayerSwap) {
+        match swap {
+            PlayerSwap::NextUp => {
+                let maybe_player = self.players.get(self.current_player.1 + 1);
+                match maybe_player {
+                    Some(player) => self.current_player = (player.id, self.current_player.1 + 1),
+                    None => self.current_player = (self.players[0].id, 0),
+                }
+            }
+            PlayerSwap::NextDown => {
+                let maybe_player = self.players.get(self.current_player.1 - 1);
+                match maybe_player {
+                    Some(player) => self.current_player = (player.id, self.current_player.1 - 1),
+                    None => self.current_player = (self.players[M::PLAYERS - 1].id, M::PLAYERS - 1),
+                }
+            }
+            PlayerSwap::Same => {}
+            PlayerSwap::Custom(next) => {
+                self.current_player = self
+                    .players
+                    .iter()
+                    .enumerate()
+                    .find(|(idx, player)| player.id == next)
+                    .map(|(idx, player)| (player.id, idx))
+                    .unwrap()
+            }
+        }
     }
 }
 

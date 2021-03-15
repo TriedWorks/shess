@@ -5,7 +5,7 @@ pub enum PieceType {
     Rook,
     Bishop,
     Knight,
-    Pawn
+    Pawn,
 }
 
 impl From<PieceType> for i32 {
@@ -30,7 +30,7 @@ impl From<i32> for PieceType {
             2 => PieceType::Bishop,
             1 => PieceType::Knight,
             0 => PieceType::Pawn,
-            _ => panic!("Invalid number!")
+            _ => panic!("Invalid number!"),
         }
     }
 }
