@@ -240,6 +240,6 @@ impl Mode for Default8x8 {
     }
 
     fn next_player(&self) -> PlayerSwap {
-        unimplemented!()
+        PlayerSwap::NextUp
     }
 }

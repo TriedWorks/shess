@@ -1,4 +1,4 @@
-use crate::{Backend, Message};
+use crate::{Backend};
 use std::error::Error;
 
 pub struct Discord {

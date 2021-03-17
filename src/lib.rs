@@ -164,7 +164,8 @@ impl<M: Mode, B: Backend> Game<M, B> {
                 self.next_move()
             }
         }
-        self.mode.execute_move(self.current_player.0)
+        self.mode.execute_move(self.current_player.0);
+        self.swap_player(self.mode.next_player())
     }
 
     pub fn backend(&mut self) -> &mut B {
@@ -193,7 +194,7 @@ impl<M: Mode, B: Backend> Game<M, B> {
                     .players
                     .iter()
                     .enumerate()
-                    .find(|(idx, player)| player.id == next)
+                    .find(|(_, player)| player.id == next)
                     .map(|(idx, player)| (player.id, idx))
                     .unwrap()
             }
