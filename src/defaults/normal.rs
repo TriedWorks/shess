@@ -98,10 +98,11 @@ impl Default8x8 {
         //     return Err(String::from("Invalid Move"));
         // }
 
-        // if !self.check_unoccupied(end) {
-        //     // TODO Add castling here!
-        //     return Err(String::from("Already Occupied"));
-        // }
+        let maybe_kill = self.pieces.iter().position(|piece| piece.pos == end && player_id != piece.player);
+        if let Some(kill) = maybe_kill {
+            println!("kill");
+            self.pieces.remove(kill);
+        }
 
         self.next_move = Some((piece_id, end));
 
@@ -147,7 +148,7 @@ impl Default8x8 {
             PieceType::Bishop => d_width == d_height,
             PieceType::Knight => d_width == 2 && d_height == 1 || d_height == 2 || d_width == 1,
 
-            PieceType::Pawn => d_height == 1,
+            PieceType::Pawn => d_width == 1,
         }
     }
 
@@ -297,7 +298,7 @@ impl Mode for Default8x8 {
         let mut render_board: String = String::new();
         for y in 0..8 {
             for x in 0..8 {
-                render_board.push_str(&pre_render_board[8 * y + x]);
+                render_board.push_str(&pre_render_board[8 * x + y]);
             }
             render_board.push_str("\n");
         }

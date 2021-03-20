@@ -204,5 +204,11 @@ fn test() {
     game.next_move();
     game.backend.send(String::from("6 3 -> 5 3"));
     game.next_move();
+    game.backend.send(String::from("2 2 -> 3 2"));
+    game.next_move();
+    game.backend.send(String::from("5 3 -> 4 3"));
+    game.next_move();
+    game.backend.send(String::from("3 2 -> 4 3"));
+    game.next_move();
     println!("{}", game.mode.rendered_board());
 }
