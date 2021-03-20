@@ -105,6 +105,8 @@ pub trait Mode {
 
     fn board(&self) -> (Vec<RenderMove2D>, usize);
 
+    fn rendered_board(&self) -> String;
+
     fn next_player(&self) -> PlayerSwap;
 }
 

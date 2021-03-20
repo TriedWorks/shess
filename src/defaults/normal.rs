@@ -188,6 +188,29 @@ impl Default8x8 {
         let end = Point::from(split[1].clone());
         (start, end)
     }
+
+    fn piece_to_emoji(player_id: i32, piece_id: i32) -> String {
+        let piece = PieceType::from(piece_id);
+        if player_id == 0 {
+            match piece {
+                PieceType::King => String::from("😳"),
+                PieceType::Queen => String::from("😇"),
+                PieceType::Rook => String::from("🤛"),
+                PieceType::Bishop => String::from("🤥"),
+                PieceType::Knight => String::from("🐎"),
+                PieceType::Pawn => String::from("🥵")
+            }
+        } else {
+            match piece {
+                PieceType::King => String::from("😈"),
+                PieceType::Queen => String::from("👹"),
+                PieceType::Rook => String::from("🤜"),
+                PieceType::Bishop => String::from("👾"),
+                PieceType::Knight => String::from("🐴"),
+                PieceType::Pawn => String::from("🥶")
+            }
+        }
+    }
 }
 
 impl Mode for Default8x8 {
@@ -239,7 +262,53 @@ impl Mode for Default8x8 {
         (moves, 8)
     }
 
+    fn rendered_board(&self) -> String {
+        let mut pre_render_board: Vec<String> = Vec::new();
+        for y in 0..8 {
+            for x in 0..8 {
+                if x % 2 == 0 {
+                    if y % 2 == 0 {
+                        pre_render_board.push(String::from("⬜️"));
+                    } else {
+                        pre_render_board.push(String::from("⬛️"));
+                    }
+                } else {
+                    if y % 2 == 0 {
+                        pre_render_board.push(String::from("⬛️"));
+                    } else {
+                        pre_render_board.push(String::from("⬜️"));
+                    }
+                }
+            }
+        }
+
+        let mut board = self.board();
+        board.0.iter_mut().for_each(|piece| {
+            piece.pos[1] -= 7;
+            piece.pos[1].abs();
+        });
+
+        for mov in board.0.iter() {
+            let pos = mov.pos;
+            let x = pos[0] as usize;
+            let y = pos[1] as usize;
+            pre_render_board[8 * x + y] = Self::piece_to_emoji(mov.player_id, mov.piece_id);
+        }
+
+        let mut render_board: String = String::new();
+        for y in 0..8 {
+            for x in 0..8 {
+                render_board.push_str(&pre_render_board[8 * x + y]);
+            }
+            render_board.push_str("\n");
+        }
+
+        render_board
+    }
+
     fn next_player(&self) -> PlayerSwap {
         PlayerSwap::NextUp
     }
+
+
 }
