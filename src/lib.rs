@@ -22,6 +22,7 @@ pub struct RenderMove2D {
     pub pos: Point<i32, 2>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Player {
     pub id: i32,
 }
@@ -69,6 +70,7 @@ impl<const N: usize> Piece<{ N }> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct Board<const DIMS: usize> {
     start: Point<i32, { DIMS }>,
     size: [i32; DIMS],
@@ -80,6 +82,7 @@ impl<const DIMS: usize> Board<{ DIMS }> {
     }
 }
 
+#[derive(Debug, Clone)]
 pub enum PlayerSwap {
     NextUp,
     NextDown,
@@ -119,6 +122,7 @@ pub trait Backend {
     fn backend_to_player(&self, id: Self::Id) -> i32;
 }
 
+#[derive(Debug, Clone)]
 pub struct Game<M: Mode, B: Backend> {
     pub mode: M,
     pub backend: B,
