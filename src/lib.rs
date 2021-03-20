@@ -158,24 +158,7 @@ impl<M: Mode, B: Backend> Game<M, B> {
             };
             input = self.backend.receive();
         }
-        match self
-            .mode
-            .next_move(input.unwrap().unwrap(), self.current_player.0)
-        {
-            Ok(_) => {}
-            Err(err) => {
-                match self
-                    .backend
-                    .send(String::from(format!("Error in Move: {}", err)))
-                {
-                    Ok(_) => {}
-                    Err(err) => {
-                        panic!(format!("{}", err))
-                    }
-                };
-                self.next_move()
-            }
-        }
+        self.mode.next_move(input.unwrap().unwrap(), self.current_player.0).unwrap();
         self.mode.execute_move(self.current_player.0);
         self.swap_player(self.mode.next_player())
     }
@@ -216,5 +199,10 @@ fn test() {
     use crate::defaults::normal::Default8x8;
     use crate::discord::Discord;
     let mut game: Game<Default8x8, Discord> = Game::new();
-    println!("{}", game.mode.rendered_board())
+    println!("{}", game.mode.rendered_board());
+    game.backend.send(String::from("1 2 -> 2 2"));
+    game.next_move();
+    game.backend.send(String::from("6 3 -> 5 3"));
+    game.next_move();
+    println!("{}", game.mode.rendered_board());
 }

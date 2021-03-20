@@ -64,9 +64,9 @@ impl Default8x8 {
         self.pieces[id] = Piece::new(1, id as i32, PieceType::Bishop.into(), Point::from([7, 5]));
         id += 1;
 
-        self.pieces[id] = Piece::new(1, id as i32, PieceType::Queen.into(), Point::from([7, 3]));
+        self.pieces[id] = Piece::new(1, id as i32, PieceType::Queen.into(), Point::from([7, 4]));
         id += 1;
-        self.pieces[id] = Piece::new(1, id as i32, PieceType::King.into(), Point::from([7, 4]));
+        self.pieces[id] = Piece::new(1, id as i32, PieceType::King.into(), Point::from([7, 3]));
     }
 
     fn handle_input(
@@ -94,14 +94,14 @@ impl Default8x8 {
             return Err(String::from("Position is out of Bounds"));
         }
 
-        if !Self::check_valid_move(piece_type.into(), start, end) {
-            return Err(String::from("Invalid Move"));
-        }
+        // if !Self::check_valid_move(piece_type.into(), start, end) {
+        //     return Err(String::from("Invalid Move"));
+        // }
 
-        if !self.check_unoccupied(end) {
-            // TODO Add castling here!
-            return Err(String::from("Already Occupied"));
-        }
+        // if !self.check_unoccupied(end) {
+        //     // TODO Add castling here!
+        //     return Err(String::from("Already Occupied"));
+        // }
 
         self.next_move = Some((piece_id, end));
 
@@ -184,8 +184,10 @@ impl Default8x8 {
             .into_iter()
             .map(|pos| pos.to_string())
             .collect();
-        let start = Point::from(split[0].clone());
-        let end = Point::from(split[1].clone());
+
+        println!("split:  {:?}", split);
+        let start = Point::from(split.get(0).unwrap().to_string());
+        let end = Point::from(split.get(1).unwrap().to_string());
         (start, end)
     }
 
@@ -195,7 +197,7 @@ impl Default8x8 {
             match piece {
                 PieceType::King => String::from("😳"),
                 PieceType::Queen => String::from("😇"),
-                PieceType::Rook => String::from("🤛"),
+                PieceType::Rook => String::from("🤜"),
                 PieceType::Bishop => String::from("🤥"),
                 PieceType::Knight => String::from("🐎"),
                 PieceType::Pawn => String::from("🥵")
@@ -204,7 +206,7 @@ impl Default8x8 {
             match piece {
                 PieceType::King => String::from("😈"),
                 PieceType::Queen => String::from("👹"),
-                PieceType::Rook => String::from("🤜"),
+                PieceType::Rook => String::from("🤛"),
                 PieceType::Bishop => String::from("👾"),
                 PieceType::Knight => String::from("🐴"),
                 PieceType::Pawn => String::from("🥶")
@@ -283,10 +285,6 @@ impl Mode for Default8x8 {
         }
 
         let mut board = self.board();
-        board.0.iter_mut().for_each(|piece| {
-            piece.pos[1] -= 7;
-            piece.pos[1] = piece.pos[1].abs();
-        });
 
         for mov in board.0.iter() {
             let pos = mov.pos;
@@ -298,7 +296,7 @@ impl Mode for Default8x8 {
         let mut render_board: String = String::new();
         for y in 0..8 {
             for x in 0..8 {
-                render_board.push_str(&pre_render_board[8 * x + y]);
+                render_board.push_str(&pre_render_board[8 * y + x]);
             }
             render_board.push_str("\n");
         }
