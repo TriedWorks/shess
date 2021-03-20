@@ -254,7 +254,7 @@ impl Mode for Default8x8 {
         for piece in &self.pieces {
             moves.push(RenderMove2D {
                 player_id: piece.player,
-                piece_id: piece.id,
+                piece_id: piece.ty,
                 pos: piece.pos,
             });
         }
@@ -285,14 +285,14 @@ impl Mode for Default8x8 {
         let mut board = self.board();
         board.0.iter_mut().for_each(|piece| {
             piece.pos[1] -= 7;
-            piece.pos[1].abs();
+            piece.pos[1] = piece.pos[1].abs();
         });
 
         for mov in board.0.iter() {
             let pos = mov.pos;
             let x = pos[0] as usize;
             let y = pos[1] as usize;
-            pre_render_board[8 * x + y] = Self::piece_to_emoji(mov.player_id, mov.piece_id);
+            pre_render_board[8 * y + x] = Self::piece_to_emoji(mov.player_id, mov.piece_id);
         }
 
         let mut render_board: String = String::new();

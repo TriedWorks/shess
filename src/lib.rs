@@ -216,5 +216,5 @@ fn test() {
     use crate::defaults::normal::Default8x8;
     use crate::discord::Discord;
     let mut game: Game<Default8x8, Discord> = Game::new();
-    game.next_move()
+    println!("{}", game.mode.rendered_board())
 }
