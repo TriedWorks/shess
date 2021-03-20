@@ -5,10 +5,10 @@ use fructose::algebra::linear::vector::NormedSpace;
 use glucose::linear::vec::Point;
 
 pub struct Default8x8 {
-    board: Board<2>,
-    pieces: Vec<Piece<2>>,
-    cache: MoveCache<2>,
-    next_move: Option<(i32, Point<i32, 2>)>,
+    pub board: Board<2>,
+    pub pieces: Vec<Piece<2>>,
+    pub cache: MoveCache<2>,
+    pub next_move: Option<(i32, Point<i32, 2>)>,
 }
 
 impl Default8x8 {

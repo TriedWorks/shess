@@ -9,21 +9,21 @@ pub mod terminal;
 
 #[derive(Debug, Copy, Clone)]
 pub struct Move<const N: usize> {
-    player_id: i32,
-    piece_id: i32,
-    from: Option<Point<i32, { N }>>,
-    to: Point<i32, { N }>,
+    pub player_id: i32,
+    pub piece_id: i32,
+    pub from: Option<Point<i32, { N }>>,
+    pub to: Point<i32, { N }>,
 }
 
 #[derive(Debug, Copy, Clone)]
 pub struct RenderMove2D {
-    player_id: i32,
-    piece_id: i32,
-    pos: Point<i32, 2>,
+    pub player_id: i32,
+    pub piece_id: i32,
+    pub pos: Point<i32, 2>,
 }
 
 pub struct Player {
-    id: i32,
+    pub id: i32,
 }
 
 impl Player {
@@ -106,18 +106,24 @@ pub trait Mode {
 }
 
 pub trait Backend {
+    type Id;
+
     fn new() -> Self;
 
-    fn receive(&self) -> Result<Option<String>, String>;
+    fn receive(&mut self) -> Result<Option<String>, String>;
 
     fn send(&mut self, msg: String) -> Result<Option<String>, String>;
+
+    fn player_to_backend(&self, id: i32) -> Self::Id;
+
+    fn backend_to_player(&self, id: Self::Id) -> i32;
 }
 
 pub struct Game<M: Mode, B: Backend> {
-    mode: M,
-    backend: B,
-    players: Vec<Player>,
-    current_player: (i32, usize),
+    pub mode: M,
+    pub backend: B,
+    pub players: Vec<Player>,
+    pub current_player: (i32, usize),
 }
 
 impl<M: Mode, B: Backend> Game<M, B> {
@@ -166,10 +172,6 @@ impl<M: Mode, B: Backend> Game<M, B> {
         }
         self.mode.execute_move(self.current_player.0);
         self.swap_player(self.mode.next_player())
-    }
-
-    pub fn backend(&mut self) -> &mut B {
-        &mut self.backend
     }
 
     fn swap_player(&mut self, swap: PlayerSwap) {
