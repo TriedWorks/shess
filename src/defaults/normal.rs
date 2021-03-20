@@ -298,7 +298,7 @@ impl Mode for Default8x8 {
         let mut render_board: String = String::new();
         for y in 0..8 {
             for x in 0..8 {
-                render_board.push_str(&pre_render_board[8 * x + y]);
+                render_board.push_str(&pre_render_board[8 * y + x]);
             }
             render_board.push_str("\n");
         }
