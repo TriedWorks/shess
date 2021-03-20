@@ -12,7 +12,7 @@ pub struct Discord {
 impl Discord {
     pub fn set_player(&mut self, shess_id: i32, discord_id: i32) {
         self.discord_player.insert(discord_id, shess_id);
-        self.discord_player.insert(shess_id, discord_id);
+        self.player_discord.insert(shess_id, discord_id);
     }
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "shess"
-version = "0.1.5"
+version = "0.1.7"
 authors = ["Sebastian <Sebastian@Strobl.net>"]
 edition = "2018"
 publish = true
@@ -17,4 +17,4 @@ discord = []
 
 [dependencies]
 fructose = "0.3.3"
-glucose = "0.2.1"
+glucose = "0.2.2"
