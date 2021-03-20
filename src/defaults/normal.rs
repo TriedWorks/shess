@@ -286,11 +286,12 @@ impl Mode for Default8x8 {
 
         let mut board = self.board();
 
+
         for mov in board.0.iter() {
             let pos = mov.pos;
             let x = pos[0] as usize;
             let y = pos[1] as usize;
-            pre_render_board[8 * y + x] = Self::piece_to_emoji(mov.player_id, mov.piece_id);
+            pre_render_board[8 * x + y] = Self::piece_to_emoji(mov.player_id, mov.piece_id);
         }
 
         let mut render_board: String = String::new();
